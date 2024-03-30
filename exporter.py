@@ -147,7 +147,7 @@ async def get_runtime_data(ip_address):
 
 def main():
   parser = argparse.ArgumentParser("goodwe_exporter")
-  parser.add_argument("-ip", "--ip-address", help="IP address of the inverter", type=str,required=True)
+  parser.add_argument("-ip", "--ip-address", help="IP address of the inverter", type=str, required=True)
   args = parser.parse_args()
   logger.info(f"Starting with inverter ip = {args.ip_address}")
   start_http_server(8080)
