@@ -15,55 +15,56 @@ fail_count = 0
 
 metric_def = {
   "vpv1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ipv1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ppv1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "vpv2": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ipv2": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ppv2": {
-    "type": "guage"
+    "type": "gauge"
   },
   "vpv3": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ipv3": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ppv3": {
-    "type": "guage"
+    "type": "gauge"
   },
   "vline1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "vgrid1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "fgrid1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "igrid1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "pgrid1": {
-    "type": "guage"
+    "type": "gauge"
   },
   "ppv": {
-    "type": "guage"
+    "type": "gauge"
   },
   "temperature": {
-    "type": "guage"
+    "type": "gauge"
   },
   "e_day": {
-    "type": "counter"
+    "type": "gauge",
+    "dontreset": True
   },
   "e_total": {
     "type": "counter"
@@ -72,7 +73,7 @@ metric_def = {
     "type": "counter"
   },
   "vbus": {
-    "type": "guage"
+    "type": "gauge"
   }
 }
 
@@ -118,13 +119,13 @@ async def get_runtime_data(ip_address):
         continue
       if id in metric_def:
         md = metric_def[id]
-        if md["type"] == "guage":
+        if md["type"] == "gauge":
           if id not in metrics:
             metrics[id] = Gauge(id, f"{metric['unit']} {metric['name']}")
-            logger.info(f"Registered {id} as a Guage metric")
+            logger.info(f"Registered {id} as a Gauge metric")
           metrics[id].set(metric["value"])
         if md["type"] == "counter":
-          unit_mult = 0
+          unit_mult = 1
           if metric["unit"] == "kWh":
             unit_mult = 1000
           if id not in metrics:
@@ -142,8 +143,12 @@ async def get_runtime_data(ip_address):
       for id, metric in metrics.items():
         if id == "last_metrics_ts":
           continue
-        if metric_def[id]["type"] == "guage":
-          metrics[id].set(0)
+        if metric_def[id]["type"] == "gauge":
+          if "dontreset" not in metric_def[id]:
+            logger.info(f"Resetting gauge {id} to 0")
+            metrics[id].set(0)
+          else:
+            logger.info(f"Skipping reset for {id} as dontrest is set")
 
 def main():
   parser = argparse.ArgumentParser("goodwe_exporter")
