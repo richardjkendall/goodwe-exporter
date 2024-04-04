@@ -93,7 +93,7 @@ class DateTimeEncoder(json.JSONEncoder):
       return super().default(z)
 
 async def get_runtime_data(ip_address):
-  global fail_count, last_update_ts
+  global fail_count, last_update_ts, last_update_hour
   output_dict = {}
   current_update_ts = 0
   current_update_hour = datetime.datetime.now(LOCALTZ).hour
